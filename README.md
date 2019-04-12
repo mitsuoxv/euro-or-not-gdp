@@ -1,7 +1,7 @@
 European countries’ GDP, euro or not
 ================
 Mitsuo Shiota
-2019-4-11
+2019-4-12
 
   - [Summary](#summary)
   - [Libraries](#libraries)
@@ -19,26 +19,34 @@ Mitsuo Shiota
     pdf](output/GDP-euro-or-not.pdf)
   - [How much recovered from the Great Recession boxplot, in euro or
     not, in pdf](output/GDP-euro-or-not2.pdf)
+  - [GDP growth rates plot (x: 1995-2007, y: 2007-latest) in
+    pdf](output/GDP-euro-or-not3.pdf)
+  - [GDP growth rates plot (x: 2000-2005, y: 2005-latest) in
+    pdf](output/GDP-euro-or-not4.pdf)
 
 This is my second attempt to utilize R language for economic analysis
-after [Yellen’s US Labor Market Dashboard](yellen-dashboard).
+after [Yellen’s US Labor Market
+Dashboard](https://github.com/mitsuoxv/yellen-dashboard).
 
 ## Libraries
 
-As usual I attach tidyverse package. I also attach rvest package for web
-scraping to get the euro entry date of each country. Although I don’t
-attach, I use eurostat package to get GDP data, and countrycode package
-to convert country codes to names.
+As usual I attach tidyverse package. As I will struggle with dates, I
+attach lubridate packeage. I also attach rvest package for web scraping
+to get the euro entry date of each country. Although I don’t attach, I
+use eurostat package to get GDP data, and countrycode package to convert
+country codes to names.
 
 ``` r
 library(tidyverse)
+library(lubridate)
 library(rvest)
 ```
 
 ## Get GDP data
 
 [Eurostat Database](https://ec.europa.eu/eurostat/data/database)
-provides a wide variety of data. I dig Data navigation tree down to
+provides a wide variety of data. Honestly, it is hard to find the right
+table and parameters. Anyway, I dig Data navigation tree down to
 “Quarterly national accounts”, reach “GDP and main components (output,
 expenditure and income) (namq\_10\_gdp)”, and know the table name is
 “namq\_10\_gdp”. Click Data Explorer icon, and a new window with a
@@ -148,24 +156,27 @@ eu_gdp$euro <- factor(eu_gdp$euro)
 
 ## Plot
 
-I plot quarterly real GDP from 2000 by setting 1Q 2007 (just before the
-Great Recession) = 100.
+I plot real GDP from 1Q 1995 by setting 1Q 2007 (just before the Great
+Recession) = 100.
 
 I set the common y-axis range so that I can see the movements of most
-countries easily. But, as a result, some countries went out of the plot.
-If you don’t like it, set YLIM as you like.
+countries easily. As a result, some countries went out of the plot. If
+you don’t like it, set YLIM as you like.
+
+``` r
+# set the parameters to plot
+START <- "1995-01-01"
+STD <- "2007-01-01"
+YLIM <- c(75, 125)
+```
 
 Line is colored differently depending on whether it is in euro or not.
 
 ``` r
-# set the parameters to plot
-START = "2000-01-01"
-YLIM = c(75, 125)
-
-# index "2007-01-01" = 100
+# index STD = 100
 eu_gdp <- eu_gdp %>% 
   group_by(name) %>% 
-  mutate(index = values / values[which(time == "2007-01-01")] * 100) %>% 
+  mutate(index = values / values[which(time == STD)] * 100) %>% 
   ungroup()
 
 # plot
@@ -177,7 +188,7 @@ eu_gdp %>%
   facet_wrap(~ name) +
   coord_cartesian(ylim = YLIM) +
   labs(
-    title = "Europe; Real GDP, 1Q 2007=100",
+    title = str_c("Europe; Real GDP, ", quarter(STD, with_year = TRUE), "Q=100"),
     x = "",
     y = "")
 ```
@@ -191,27 +202,23 @@ ggsave(filename = "output/GDP-euro-or-not.pdf",
 
 ## Euro or not
 
-Can I say something by looking at the plot?
+Can I say something by looking at the plot? Did the countries in euro
+fail to recover as much as the countries outside of euro did?
 
-GDP does not reflect employment, if foreigners just borrow the land to
-produce goods they bring home. GNI would be better for [Leprechaun
-Economics](https://en.wikipedia.org/wiki/Leprechaun_economics).
-
-Euro area countries are so advanced that they have already reaped low
-hanging fruits of productivity, and that their demography is not
-favorable for growth, so their growth path is not steep. On the
-contrary, some European non-euro counties are still in the developing
-stage, so their growth path is steep. If I compare how much GDP
-recovered from the Great Recession between euro and non-euro countries
-like below, I am not fair.
+I compare how much GDP recovered from the Great Recession between euro
+and non-euro countries.
 
 ``` r
-latest_gdp <- eu_gdp %>% 
+# change euro as of STD
+eu_gdp2 <- eu_gdp %>% 
+  mutate(euro = if_else(date_fixed <= STD, "Y", "N")) %>% 
+  replace_na(list(euro = "N"))
+
+# get the latest GDP for each country
+latest_gdp <- eu_gdp2 %>% 
   group_by(name) %>% 
   filter(time == max(time)) %>% 
-  ungroup() %>% 
-  mutate(euro = if_else(date_fixed <= "2007-01-01", "Y", "N")) %>% 
-  replace_na(list(euro = "N"))
+  ungroup()
 
 latest_gdp %>% 
   ggplot(aes(x = euro, y = index)) +
@@ -219,8 +226,8 @@ latest_gdp %>%
   geom_boxplot() +
   labs(
     title = "How much recovered?",
-    x = "in euro as of 1Q 2007",
-    y = "Latest Real GDP, 1Q 2007=100")
+    x = str_c("In euro or not as of ", quarter(STD, with_year = TRUE), "Q"),
+    y = str_c("Latest Real GDP, ", quarter(STD, with_year = TRUE), "Q=100"))
 ```
 
 ![](README_files/figure-gfm/latest%20GDP_boxplot-1.png)<!-- -->
@@ -275,6 +282,170 @@ latest_gdp %>%
     ## 10 2018-10-01 Cyprus   N     112. 
     ## # ... with 20 more rows
 
-I feel sympathy with Greece and Italy.
+But this comparison may be unfair. Euro area countries are so advanced
+that they have already reaped low hanging fruits of productivity, and
+that their demography is not favorable for growth, so their growth path
+is naturally not steep. On the contrary, some European non-euro counties
+are still in the developing stage, so their growth path is naturally
+steep.
+
+So I draw another plot, on x axis real GDP growth rates from 1Q 1995 to
+1Q 2007 to show the developing stage of each country, and on y axis real
+GDP growth rates from 1Q 2007 to the latest to show how much each
+country recovered from the Great Recession.
+
+``` r
+pos_gdp <- eu_gdp2 %>% 
+  filter(time == START) %>% 
+  select(time, name, index) %>% 
+  left_join(latest_gdp, by = "name")
+
+pos_gdp$time.std <- as.Date(STD)
+
+pos_gdp <- pos_gdp %>% 
+  mutate(
+    start2std = time_length(difftime(time.std, time.x), "years"),
+    std2latest = time_length(difftime(time.y, time.std), "years"),
+    gr1 = ((100 / index.x)^(1 / start2std) - 1) * 100,
+    gr2 = ((index.y / 100)^(1 / std2latest) - 1) * 100
+  )
+
+pos_gdp %>% 
+  ggplot(aes(x = gr1, y = gr2)) +
+  geom_abline(intercept = 0, slope = 1) +
+  geom_point(aes(color = euro)) +
+  geom_text(aes(label = name), hjust = -0.2, vjust = 0.3) +
+  labs(
+    title = "Real GDP growth rates (percent, annualized)",
+    x = str_c("From ", quarter(START, with_year = TRUE), "Q to ", quarter(STD, with_year = TRUE), "Q"),
+    y = str_c("From ", quarter(STD, with_year = TRUE), "Q to the latest")
+  )
+```
+
+    ## Warning: Removed 6 rows containing missing values (geom_point).
+
+    ## Warning: Removed 6 rows containing missing values (geom_text).
+
+![](README_files/figure-gfm/dotplot-1.png)<!-- -->
+
+``` r
+ggsave(filename = "output/GDP-euro-or-not3.pdf",
+       width = 6, height = 6, units = "in", dpi = 300)
+```
+
+    ## Warning: Removed 6 rows containing missing values (geom_point).
+    
+    ## Warning: Removed 6 rows containing missing values (geom_text).
+
+I lose 6 countries, because their data at 1Q 1995 is not available.
+
+If the growth rates before and after the Great Recession is the same,
+that country positions on the upslope straight line. All countries are
+below that line. How far apart from that line shows how much the growth
+rates declined after the Great Recession.
+
+Baltic Tigers (Estonia, Latvia, and Lithuania) declined most just after
+the Lehman shock, but now steadily recovering, so time will heal them.
+Except Baltic Tigers, non euro countries are near the straight line,
+means the shock did not affect their growth path significantly.
+
+On the contrary, euro countries are not near the straight line, except
+Germany. Sudden stop of capital flow to some euro countries is the
+asymmetric shock for them, and they continue to struggle.
+
+This plot looks like [Iris
+classification](https://scikit-learn.org/stable/tutorial/statistical_inference/supervised_learning.html).
+So I try linear regression, targetting euro (euro or not as of 1Q 2007)
+by featuring gr1 (real GDP growth rates from 1Q 1995 to 1Q 2007) and gr2
+(from 1Q 2007 to the latest). Look at “Pr(\>|z|)”.
+
+I would not say both gr1 and gr2 are statistically insignificant based
+on traditional 0.05 cut p-values, following [the Statement of the
+American
+Statistician](https://amstat.tandfonline.com/doi/full/10.1080/00031305.2016.1154108#.XK_rM-j7TmY).
+I think gr2 has some predicting power. If two economies are equally
+advanced (gr1 is the same), recovery looks to be slower in the euro than
+out of euro. I feel sympathy with Greece and Italy.
+
+``` r
+pos_gdp$euro <- factor(pos_gdp$euro)
+
+fit <- glm(euro ~ gr1 + gr2, data = pos_gdp, family = binomial)
+
+summary(fit)
+```
+
+    ## 
+    ## Call:
+    ## glm(formula = euro ~ gr1 + gr2, family = binomial, data = pos_gdp)
+    ## 
+    ## Deviance Residuals: 
+    ##    Min      1Q  Median      3Q     Max  
+    ## -1.293  -1.051  -0.575   1.047   2.294  
+    ## 
+    ## Coefficients:
+    ##             Estimate Std. Error z value Pr(>|z|)
+    ## (Intercept)  1.08800    1.17644   0.925    0.355
+    ## gr1         -0.06787    0.28759  -0.236    0.813
+    ## gr2         -0.77861    0.52488  -1.483    0.138
+    ## 
+    ## (Dispersion parameter for binomial family taken to be 1)
+    ## 
+    ##     Null deviance: 33.104  on 23  degrees of freedom
+    ## Residual deviance: 29.269  on 21  degrees of freedom
+    ##   (6 observations deleted due to missingness)
+    ## AIC: 35.269
+    ## 
+    ## Number of Fisher Scoring iterations: 4
+
+You can change parameters like START and STD, and may see the growth
+trend shift differently. For example, below I set START as 1Q 2000, STD
+as 1Q 2005.
+
+``` r
+# different parameters
+START <- "2000-01-01"
+STD <- "2005-01-01"
+
+# change euro as of STD
+eu_gdp2 <- eu_gdp %>% 
+  mutate(euro = if_else(date_fixed <= STD, "Y", "N")) %>% 
+  replace_na(list(euro = "N"))
+
+pos_gdp <- eu_gdp2 %>% 
+  filter(time == START) %>% 
+  select(time, name, index) %>% 
+  left_join(latest_gdp, by = "name")
+
+pos_gdp$time.std <- as.Date(STD)
+
+pos_gdp <- pos_gdp %>% 
+  mutate(
+    start2std = time_length(difftime(time.std, time.x), "years"),
+    std2latest = time_length(difftime(time.y, time.std), "years"),
+    gr1 = ((100 / index.x)^(1 / start2std) - 1) * 100,
+    gr2 = ((index.y / 100)^(1 / std2latest) - 1) * 100
+  )
+
+pos_gdp %>% 
+  ggplot(aes(x = gr1, y = gr2)) +
+  geom_abline(intercept = 0, slope = 1) +
+  geom_point(aes(color = euro)) +
+  geom_text(aes(label = name), hjust = -0.2, vjust = 0.3) +
+  labs(
+    title = "Real GDP growth rates (percent, annualized)",
+    x = str_c("From ", quarter(START, with_year = TRUE), "Q to ", quarter(STD, with_year = TRUE), "Q"),
+    y = str_c("From ", quarter(STD, with_year = TRUE), "Q to the latest")
+  )
+```
+
+![](README_files/figure-gfm/different_parameters-1.png)<!-- -->
+
+``` r
+ggsave(filename = "output/GDP-euro-or-not4.pdf",
+       width = 6, height = 6, units = "in", dpi = 300)
+```
+
+This time I don’t lose any country in the plot.
 
 EOL
