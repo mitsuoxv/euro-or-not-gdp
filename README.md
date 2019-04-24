@@ -1,7 +1,7 @@
 European countries’ GDP, euro or not
 ================
 Mitsuo Shiota
-2019-4-12
+2019-04-11
 
   - [Summary](#summary)
   - [Libraries](#libraries)
@@ -16,6 +16,8 @@ Mitsuo Shiota
         Recession](#simple-comparison-of-recovery-from-the-great-recession)
       - [Before and after growth rates, and classifier: logistic
         regression](#before-and-after-growth-rates-and-classifier-logistic-regression)
+
+Updated: 2019-04-24
 
 ## Summary
 
@@ -86,10 +88,13 @@ I follow the order of [“Tutorial: Country codes and protocol
 order”](https://ec.europa.eu/eurostat/statistics-explained/index.php/Tutorial:Country_codes_and_protocol_order).
 
 ``` r
-country_codes_eu28 <- c("BE", "BG", "CZ", "DK", "DE", "EE", "IE",
-                        "EL", "ES", "FR", "HR", "IT", "CY", "LV",
-                        "LT", "LU", "HU", "MT", "NL", "AT", "PL", 
-                        "PT", "RO", "SI", "SK", "FI", "SE", "UK") 
+response <- read_html("https://ec.europa.eu/eurostat/statistics-explained/index.php/Tutorial:Country_codes_and_protocol_order")
+
+table <- response %>% 
+  html_nodes(xpath = "//body[@class='mediawiki ltr sitedir-ltr ns-0 ns-subject page-Tutorial_Country_codes_and_protocol_order skin-statexpflat action-view']/div[@class='container']/div[@class='row content-row']/div[@class='col-lg-12 col-md-12 col-sm-12 col-xs-12 content-col content article-content ']/div[@id='content']/div[@id='bodyContent']/div[@id='mw-content-text']/div[@id='articleContentPane']/div[@id='article-panel']/div[@class='panel-body']/div[@class='panel-body-content']/div[@class='content-section'][2]/table[@class='colheader FCK__ShowTableBorders']") %>% 
+  html_table()
+
+country_codes_eu28 <- table[[1]]$Code
 ```
 
 GDP data contain 3 countries outside EU, so I add them to codes.
@@ -423,7 +428,8 @@ gdp_gr %>%
   labs(
     title = "Real GDP growth rates (percent, annualized)",
     x = str_c("From ", quarter(START, with_year = TRUE), "Q to ", quarter(STD, with_year = TRUE), "Q"),
-    y = str_c("From ", quarter(STD, with_year = TRUE), "Q to the latest")
+    y = str_c("From ", quarter(STD, with_year = TRUE), "Q to the latest"),
+    color = str_c("euro as of\n", quarter(STD, with_year = TRUE), "Q")
   )
 ```
 
