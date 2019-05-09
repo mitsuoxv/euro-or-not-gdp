@@ -17,7 +17,7 @@ Mitsuo Shiota
       - [Before and after growth rates, and classifier: logistic
         regression](#before-and-after-growth-rates-and-classifier-logistic-regression)
 
-Updated: 2019-04-24
+Updated: 2019-05-09
 
 ## Summary
 
@@ -88,13 +88,10 @@ I follow the order of [“Tutorial: Country codes and protocol
 order”](https://ec.europa.eu/eurostat/statistics-explained/index.php/Tutorial:Country_codes_and_protocol_order).
 
 ``` r
-response <- read_html("https://ec.europa.eu/eurostat/statistics-explained/index.php/Tutorial:Country_codes_and_protocol_order")
-
-table <- response %>% 
-  html_nodes(xpath = "//body[@class='mediawiki ltr sitedir-ltr ns-0 ns-subject page-Tutorial_Country_codes_and_protocol_order skin-statexpflat action-view']/div[@class='container']/div[@class='row content-row']/div[@class='col-lg-12 col-md-12 col-sm-12 col-xs-12 content-col content article-content ']/div[@id='content']/div[@id='bodyContent']/div[@id='mw-content-text']/div[@id='articleContentPane']/div[@id='article-panel']/div[@class='panel-body']/div[@class='panel-body-content']/div[@class='content-section'][2]/table[@class='colheader FCK__ShowTableBorders']") %>% 
-  html_table()
-
-country_codes_eu28 <- table[[1]]$Code
+country_codes_eu28 <- c("BE", "BG", "CZ", "DK", "DE", "EE", "IE",
+                   "EL", "ES", "FR", "HR", "IT", "CY", "LV",
+                   "LT", "LU", "HU", "MT", "NL", "AT", "PL", 
+                   "PT", "RO", "SI", "SK", "FI", "SE", "UK") 
 ```
 
 GDP data contain 3 countries outside EU, so I add them to codes.
@@ -202,12 +199,16 @@ eu_gdp %>%
     y = "")
 ```
 
+    ## Warning: Removed 2 rows containing missing values (geom_path).
+
 ![](README_files/figure-gfm/plot-1.png)<!-- -->
 
 ``` r
 ggsave(filename = "output/GDP-euro-or-not.pdf",
        width = 10, height = 8, units = "in", dpi = 300)
 ```
+
+    ## Warning: Removed 2 rows containing missing values (geom_path).
 
 ## Euro or not
 
@@ -227,6 +228,7 @@ eu_gdp2 <- eu_gdp %>%
 
 # get the latest GDP for each country
 latest_gdp <- eu_gdp2 %>% 
+  drop_na(values) %>% 
   group_by(name) %>% 
   filter(time == max(time)) %>% 
   ungroup()
@@ -265,7 +267,7 @@ latest_gdp %>%
     ##  3 2018-10-01 Poland     N      151.
     ##  4 2018-10-01 Romania    N      141.
     ##  5 2018-10-01 Bulgaria   N      129.
-    ##  6 2018-10-01 Lithuania  N      124.
+    ##  6 2019-01-01 Lithuania  N      126.
     ##  7 2018-10-01 Luxembourg Y      124.
     ##  8 2018-10-01 Serbia     N      123.
     ##  9 2018-10-01 Czechia    N      123.
@@ -282,14 +284,14 @@ latest_gdp %>%
     ##    time       name     euro  index
     ##    <date>     <fct>    <fct> <dbl>
     ##  1 2018-10-01 Greece   Y      77.7
-    ##  2 2018-10-01 Italy    Y      95.5
+    ##  2 2019-01-01 Italy    Y      95.7
     ##  3 2018-10-01 Croatia  N     102. 
     ##  4 2018-10-01 Portugal Y     103. 
     ##  5 2018-10-01 Finland  Y     106. 
-    ##  6 2018-10-01 Spain    Y     108. 
+    ##  6 2019-01-01 Spain    Y     108. 
     ##  7 2018-10-01 Latvia   N     110. 
     ##  8 2018-10-01 Denmark  N     111. 
-    ##  9 2018-10-01 France   Y     111. 
+    ##  9 2019-01-01 France   Y     111. 
     ## 10 2018-10-01 Cyprus   N     112. 
     ## # ... with 20 more rows
 
@@ -338,9 +340,9 @@ gdp_gr
     ##  5 Denmark     N      2.19  0.864
     ##  6 Estonia     N      6.93  1.19 
     ##  7 Greece      Y      3.83 -2.12 
-    ##  8 Spain       Y      3.75  0.632
+    ##  8 Spain       Y      3.75  0.679
     ##  9 Finland     Y      3.95  0.491
-    ## 10 France      Y      2.30  0.896
+    ## 10 France      Y      2.30  0.904
     ## # ... with 14 more rows
 
 I lose 6 countries, because their data at 1Q 1995 is not available.
@@ -400,19 +402,19 @@ summary(fit)
     ## 
     ## Deviance Residuals: 
     ##     Min       1Q   Median       3Q      Max  
-    ## -1.2926  -1.0508  -0.5751   1.0470   2.2936  
+    ## -1.2938  -1.0534  -0.5771   1.0571   2.2885  
     ## 
     ## Coefficients:
     ##             Estimate Std. Error z value Pr(>|z|)
-    ## (Intercept)  1.08845    1.17644   0.925    0.355
-    ## gr1         -0.06798    0.28757  -0.236    0.813
-    ## gr2         -0.77856    0.52498  -1.483    0.138
+    ## (Intercept)  1.08769    1.17568   0.925    0.355
+    ## gr1         -0.06692    0.28792  -0.232    0.816
+    ## gr2         -0.77721    0.52568  -1.478    0.139
     ## 
     ## (Dispersion parameter for binomial family taken to be 1)
     ## 
     ##     Null deviance: 33.104  on 23  degrees of freedom
-    ## Residual deviance: 29.271  on 21  degrees of freedom
-    ## AIC: 35.271
+    ## Residual deviance: 29.292  on 21  degrees of freedom
+    ## AIC: 35.292
     ## 
     ## Number of Fisher Scoring iterations: 4
 
@@ -500,16 +502,16 @@ gdp_gr %>%
     ##    name       euro    gr1    gr2 pred_prob pred 
     ##    <fct>      <fct> <dbl>  <dbl>     <dbl> <fct>
     ##  1 Greece     Y      3.83 -2.12     0.923  Y    
-    ##  2 Italy      Y      1.53 -0.393    0.784  Y    
+    ##  2 Italy      Y      1.53 -0.363    0.780  Y    
     ##  3 Portugal   Y      2.44  0.224    0.679  Y    
-    ##  4 Finland    Y      3.95  0.491    0.608  Y    
-    ##  5 Spain      Y      3.75  0.632    0.585  Y    
-    ##  6 France     Y      2.30  0.896    0.558  Y    
+    ##  4 Finland    Y      3.95  0.491    0.609  Y    
+    ##  5 Spain      Y      3.75  0.679    0.577  Y    
+    ##  6 France     Y      2.30  0.904    0.558  Y    
     ##  7 Belgium    Y      2.45  1.05     0.527  Y    
     ##  8 Germany    Y      1.60  1.25     0.502  Y    
-    ##  9 Slovenia   Y      4.21  1.20     0.467  N    
-    ## 10 Luxembourg Y      4.80  1.86     0.334  N    
-    ## 11 Ireland    Y      7.32  4.04     0.0721 N
+    ##  9 Slovenia   Y      4.21  1.20     0.468  N    
+    ## 10 Luxembourg Y      4.80  1.86     0.336  N    
+    ## 11 Ireland    Y      7.32  4.04     0.0729 N
 
 You can change parameters like START and STD, and may see the growth
 trend shift differently. For example, below I set START as 1Q 2000, STD
@@ -532,19 +534,19 @@ STD <- "2005-01-01"
     ## # A tibble: 13 x 6
     ##    name        euro    gr1    gr2 pred_prob pred 
     ##    <fct>       <fct> <dbl>  <dbl>     <dbl> <fct>
-    ##  1 Italy       Y      1.87 -0.336    0.855  Y    
+    ##  1 Italy       Y      1.87 -0.311    0.852  Y    
     ##  2 Portugal    Y      1.63  0.192    0.820  Y    
-    ##  3 Greece      Y      5.73 -1.81     0.800  Y    
+    ##  3 Greece      Y      5.73 -1.81     0.798  Y    
     ##  4 Germany     Y      1.91  1.07     0.704  Y    
-    ##  5 France      Y      2.76  0.765    0.683  Y    
+    ##  5 France      Y      2.76  0.775    0.682  Y    
     ##  6 Netherlands Y      2.85  0.953    0.650  Y    
-    ##  7 Belgium     Y      3.03  0.894    0.644  Y    
+    ##  7 Belgium     Y      3.03  0.898    0.643  Y    
     ##  8 Finland     Y      4.21  0.419    0.620  Y    
-    ##  9 Austria     Y      3.21  1.00     0.613  Y    
-    ## 10 Spain       Y      5.12  0.540    0.526  Y    
+    ##  9 Austria     Y      3.18  1.01     0.615  Y    
+    ## 10 Spain       Y      5.12  0.582    0.519  Y    
     ## 11 Slovenia    Y      6.24  1.03     0.356  N    
-    ## 12 Luxembourg  Y      5.34  1.59     0.345  N    
-    ## 13 Ireland     Y      8.45  3.44     0.0529 N
+    ## 12 Luxembourg  Y      5.34  1.59     0.346  N    
+    ## 13 Ireland     Y      8.45  3.44     0.0536 N
 
 This time I don’t lose any country, and Germany is more euro-ic.
 
