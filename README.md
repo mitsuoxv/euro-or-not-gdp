@@ -17,7 +17,7 @@ Mitsuo Shiota
       - [Before and after growth rates, and classifier: logistic
         regression](#before-and-after-growth-rates-and-classifier-logistic-regression)
 
-Updated: 2019-05-09
+Updated: 2019-08-22
 
 ## Summary
 
@@ -262,16 +262,16 @@ latest_gdp %>%
     ## # A tibble: 30 x 4
     ##    time       name       euro  index
     ##    <date>     <fct>      <fct> <dbl>
-    ##  1 2018-10-01 Malta      N      167.
-    ##  2 2018-10-01 Ireland    Y      159.
-    ##  3 2018-10-01 Poland     N      151.
-    ##  4 2018-10-01 Romania    N      141.
-    ##  5 2018-10-01 Bulgaria   N      129.
-    ##  6 2019-01-01 Lithuania  N      126.
-    ##  7 2018-10-01 Luxembourg Y      124.
-    ##  8 2018-10-01 Serbia     N      123.
-    ##  9 2018-10-01 Czechia    N      123.
-    ## 10 2018-10-01 Sweden     N      122.
+    ##  1 2019-01-01 Malta      N      167.
+    ##  2 2019-01-01 Ireland    Y      160.
+    ##  3 2019-01-01 Poland     N      154.
+    ##  4 2019-04-01 Romania    N      144.
+    ##  5 2019-01-01 Bulgaria   N      131.
+    ##  6 2019-04-01 Lithuania  N      127.
+    ##  7 2019-01-01 Luxembourg Y      125.
+    ##  8 2019-01-01 Czechia    N      124.
+    ##  9 2019-01-01 Serbia     N      123.
+    ## 10 2019-04-01 Sweden     N      122.
     ## # ... with 20 more rows
 
 ``` r
@@ -283,16 +283,16 @@ latest_gdp %>%
     ## # A tibble: 30 x 4
     ##    time       name     euro  index
     ##    <date>     <fct>    <fct> <dbl>
-    ##  1 2018-10-01 Greece   Y      77.7
-    ##  2 2019-01-01 Italy    Y      95.7
-    ##  3 2018-10-01 Croatia  N     102. 
-    ##  4 2018-10-01 Portugal Y     103. 
-    ##  5 2018-10-01 Finland  Y     106. 
-    ##  6 2019-01-01 Spain    Y     108. 
-    ##  7 2018-10-01 Latvia   N     110. 
-    ##  8 2018-10-01 Denmark  N     111. 
-    ##  9 2019-01-01 France   Y     111. 
-    ## 10 2018-10-01 Cyprus   N     112. 
+    ##  1 2019-01-01 Greece   Y      77.9
+    ##  2 2019-04-01 Italy    Y      95.7
+    ##  3 2019-01-01 Portugal Y     103. 
+    ##  4 2019-01-01 Croatia  N     104. 
+    ##  5 2019-01-01 Finland  Y     105. 
+    ##  6 2019-04-01 Spain    Y     109. 
+    ##  7 2019-01-01 Latvia   N     110. 
+    ##  8 2019-01-01 Denmark  N     111. 
+    ##  9 2019-04-01 France   Y     112. 
+    ## 10 2019-01-01 Cyprus   N     112. 
     ## # ... with 20 more rows
 
 But this comparison may be unfair. Euro area countries are so advanced
@@ -330,22 +330,20 @@ gdp_gr <- gdp_2index %>%
 gdp_gr
 ```
 
-    ## # A tibble: 24 x 4
+    ## # A tibble: 25 x 4
     ##    name        euro    gr1    gr2
     ##    <fct>       <fct> <dbl>  <dbl>
-    ##  1 Belgium     Y      2.45  1.05 
-    ##  2 Bulgaria    N      3.49  2.20 
-    ##  3 Switzerland N      2.17  1.57 
-    ##  4 Germany     Y      1.60  1.25 
-    ##  5 Denmark     N      2.19  0.864
-    ##  6 Estonia     N      6.93  1.19 
-    ##  7 Greece      Y      3.83 -2.12 
-    ##  8 Spain       Y      3.75  0.679
-    ##  9 Finland     Y      3.95  0.491
-    ## 10 France      Y      2.30  0.904
-    ## # ... with 14 more rows
-
-I lose 6 countries, because their data at 1Q 1995 is not available.
+    ##  1 Belgium     Y      2.45  1.06 
+    ##  2 Bulgaria    N      3.49  2.26 
+    ##  3 Switzerland N      2.17  1.60 
+    ##  4 Cyprus      N      4.16  0.971
+    ##  5 Germany     Y      1.54  1.28 
+    ##  6 Denmark     N      2.19  0.856
+    ##  7 Estonia     N      6.93  1.19 
+    ##  8 Greece      Y      3.83 -2.06 
+    ##  9 Spain       Y      3.75  0.700
+    ## 10 Finland     Y      3.93  0.408
+    ## # ... with 15 more rows
 
 ``` r
 gdp_2index %>% 
@@ -353,15 +351,16 @@ gdp_2index %>%
   select(name)
 ```
 
-    ## # A tibble: 6 x 1
+    ## # A tibble: 5 x 1
     ##   name       
     ##   <fct>      
     ## 1 Austria    
-    ## 2 Cyprus     
-    ## 3 Czechia    
-    ## 4 Croatia    
-    ## 5 Malta      
-    ## 6 Netherlands
+    ## 2 Czechia    
+    ## 3 Croatia    
+    ## 4 Malta      
+    ## 5 Netherlands
+
+I lose 5 countries, because their data at 1Q 1995 is not available.
 
 If the growth rates before and after the Great Recession is the same,
 that country positions on the upslope straight line. All countries are
@@ -402,19 +401,19 @@ summary(fit)
     ## 
     ## Deviance Residuals: 
     ##     Min       1Q   Median       3Q      Max  
-    ## -1.2938  -1.0534  -0.5771   1.0571   2.2885  
+    ## -1.2700  -0.9968  -0.6390   1.1041   2.2997  
     ## 
     ## Coefficients:
     ##             Estimate Std. Error z value Pr(>|z|)
-    ## (Intercept)  1.08769    1.17568   0.925    0.355
-    ## gr1         -0.06692    0.28792  -0.232    0.816
-    ## gr2         -0.77721    0.52568  -1.478    0.139
+    ## (Intercept)  1.05666    1.16957   0.903    0.366
+    ## gr1         -0.09889    0.28741  -0.344    0.731
+    ## gr2         -0.73067    0.50484  -1.447    0.148
     ## 
     ## (Dispersion parameter for binomial family taken to be 1)
     ## 
-    ##     Null deviance: 33.104  on 23  degrees of freedom
-    ## Residual deviance: 29.292  on 21  degrees of freedom
-    ## AIC: 35.292
+    ##     Null deviance: 34.296  on 24  degrees of freedom
+    ## Residual deviance: 30.608  on 22  degrees of freedom
+    ## AIC: 36.608
     ## 
     ## Number of Fisher Scoring iterations: 4
 
@@ -483,14 +482,14 @@ table(gdp_gr$euro, gdp_gr$pred, deparse.level = 2)
 
     ##            gdp_gr$pred
     ## gdp_gr$euro  N  Y
-    ##           N 12  1
-    ##           Y  3  8
+    ##           N 13  1
+    ##           Y  4  7
 
 ``` r
 mean(gdp_gr$euro == gdp_gr$pred)
 ```
 
-    ## [1] 0.8333333
+    ## [1] 0.8
 
 ``` r
 gdp_gr %>% 
@@ -501,17 +500,17 @@ gdp_gr %>%
     ## # A tibble: 11 x 6
     ##    name       euro    gr1    gr2 pred_prob pred 
     ##    <fct>      <fct> <dbl>  <dbl>     <dbl> <fct>
-    ##  1 Greece     Y      3.83 -2.12     0.923  Y    
-    ##  2 Italy      Y      1.53 -0.363    0.780  Y    
-    ##  3 Portugal   Y      2.44  0.224    0.679  Y    
-    ##  4 Finland    Y      3.95  0.491    0.609  Y    
-    ##  5 Spain      Y      3.75  0.679    0.577  Y    
-    ##  6 France     Y      2.30  0.904    0.558  Y    
-    ##  7 Belgium    Y      2.45  1.05     0.527  Y    
-    ##  8 Germany    Y      1.60  1.25     0.502  Y    
-    ##  9 Slovenia   Y      4.21  1.20     0.468  N    
-    ## 10 Luxembourg Y      4.80  1.86     0.336  N    
-    ## 11 Ireland    Y      7.32  4.04     0.0729 N
+    ##  1 Greece     Y      3.83 -2.06     0.899  Y    
+    ##  2 Italy      Y      1.53 -0.361    0.763  Y    
+    ##  3 Portugal   Y      2.44  0.267    0.650  Y    
+    ##  4 Finland    Y      3.93  0.408    0.591  Y    
+    ##  5 Spain      Y      3.75  0.700    0.544  Y    
+    ##  6 France     Y      2.30  0.925    0.538  Y    
+    ##  7 Belgium    Y      2.45  1.06     0.510  Y    
+    ##  8 Germany    Y      1.54  1.28     0.493  N    
+    ##  9 Slovenia   Y      4.21  1.24     0.434  N    
+    ## 10 Luxembourg Y      4.80  1.87     0.314  N    
+    ## 11 Ireland    Y      7.33  3.97     0.0711 N
 
 You can change parameters like START and STD, and may see the growth
 trend shift differently. For example, below I set START as 1Q 2000, STD
@@ -534,19 +533,19 @@ STD <- "2005-01-01"
     ## # A tibble: 13 x 6
     ##    name        euro    gr1    gr2 pred_prob pred 
     ##    <fct>       <fct> <dbl>  <dbl>     <dbl> <fct>
-    ##  1 Italy       Y      1.87 -0.311    0.852  Y    
-    ##  2 Portugal    Y      1.63  0.192    0.820  Y    
-    ##  3 Greece      Y      5.73 -1.81     0.798  Y    
-    ##  4 Germany     Y      1.91  1.07     0.704  Y    
-    ##  5 France      Y      2.76  0.775    0.682  Y    
-    ##  6 Netherlands Y      2.85  0.953    0.650  Y    
-    ##  7 Belgium     Y      3.03  0.898    0.643  Y    
-    ##  8 Finland     Y      4.21  0.419    0.620  Y    
-    ##  9 Austria     Y      3.18  1.01     0.615  Y    
-    ## 10 Spain       Y      5.12  0.582    0.519  Y    
-    ## 11 Slovenia    Y      6.24  1.03     0.356  N    
-    ## 12 Luxembourg  Y      5.34  1.59     0.346  N    
-    ## 13 Ireland     Y      8.45  3.44     0.0536 N
+    ##  1 Italy       Y      1.87 -0.311    0.856  Y    
+    ##  2 Portugal    Y      1.63  0.229    0.818  Y    
+    ##  3 Greece      Y      5.73 -1.77     0.810  Y    
+    ##  4 Germany     Y      1.80  1.10     0.706  Y    
+    ##  5 France      Y      2.76  0.794    0.680  Y    
+    ##  6 Netherlands Y      2.85  0.989    0.644  Y    
+    ##  7 Belgium     Y      3.03  0.906    0.643  Y    
+    ##  8 Finland     Y      4.36  0.350    0.625  Y    
+    ##  9 Austria     Y      3.17  1.03     0.613  Y    
+    ## 10 Spain       Y      5.12  0.601    0.523  Y    
+    ## 11 Slovenia    Y      6.25  1.06     0.357  N    
+    ## 12 Luxembourg  Y      5.34  1.60     0.345  N    
+    ## 13 Ireland     Y      8.53  3.40     0.0524 N
 
 This time I don’t lose any country, and Germany is more euro-ic.
 

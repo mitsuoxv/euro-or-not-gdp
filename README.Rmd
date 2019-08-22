@@ -254,14 +254,15 @@ gdp_gr
 
 ```
 
-I lose 6 countries, because their data at 1Q 1995 is not available.
-
 ```{r lose_countries}
 gdp_2index %>% 
   anti_join(gdp_gr, by = "name") %>% 
   select(name)
 
 ```
+
+I lose `r gdp_2index %>% anti_join(gdp_gr, by = "name") %>% nrow()` countries, because their data at 1Q 1995 is not available.
+
 
 If the growth rates before and after the Great Recession is the same, that country positions on the upslope straight line. All countries are below that line. How far apart from that line shows how much the growth rates declined after the Great Recession.
 
