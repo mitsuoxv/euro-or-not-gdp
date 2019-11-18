@@ -38,7 +38,7 @@ library(rvest)
 
 [Eurostat Database](https://ec.europa.eu/eurostat/data/database) provides a wide variety of data. Honestly, it is hard to find the right table and parameters. Anyway, I dig Data navigation tree down to "Quarterly national accounts", reach "GDP and main components (output, expenditure and income) (namq_10_gdp)", and know the table name is "namq_10_gdp". Click Data Explorer icon, and a new window with a large table appears. Look at the upper part, and click + icon to know the parameters, like:
 
-- unit: CLV10_MNAC:	Chain linked volumes (2010), million units of national currency
+- unit: CLV15_MNAC:	Chain linked volumes (2015), million units of national currency
 - s_adj: SCA: Seasonally and calendar adjusted data
 - na_item: B1GQ; Gross domestic product at market prices
 
@@ -47,7 +47,7 @@ library(rvest)
 ```{r eurostat, cache=FALSE}
 eu_gdp <- eurostat::get_eurostat(id = "namq_10_gdp",
                                  filters = list(
-                                   unit = "CLV10_MNAC",
+                                   unit = "CLV15_MNAC",
                                    s_adj = "SCA",
                                    na_item = "B1GQ")
                                  )
@@ -107,7 +107,7 @@ wiki <- read_html("https://en.wikipedia.org/wiki/Euro")
 
 euro_entry <- wiki %>% 
   html_nodes("table") %>% 
-  .[[5]] %>% 
+  .[[4]] %>% 
   html_nodes("td") %>% 
   html_text() %>% 
   str_sub(1, -2)
@@ -299,9 +299,10 @@ ggsave(filename = "output/GDP-euro-or-not3.pdf",
 
 ```
 
-The logstic regression model classifies correctly 20 out of 24 countries. It assigns euro probability to each country. Among euro countries, the highest probabilities go to Greece, Italy and Portuga. They are the most euro-ic countries, according to this model. Ireland has the lowest probability, and is misclassified as non-euro, probably because of [Leprechaun economics](https://en.wikipedia.org/wiki/Leprechaun_economics).
+The logstic regression model classifies correctly 18 out of 24 countries. It assigns euro probability to each country. Among euro countries, the highest probabilities go to Greece, Italy and Portugal. They are the most euro-ic countries, according to this model. Ireland has the lowest probability, and is misclassified as non-euro, probably because of [Leprechaun economics](https://en.wikipedia.org/wiki/Leprechaun_economics).
 
-The model misclassifies one country, Denmark, out of 13 non-euro countries. The model may excuse itself by saying that [Denmark krone is pegged to the euro](https://en.wikipedia.org/wiki/Denmark_and_the_euro).
+The model misclassifies 3 non-euro countries, Denmark, Norway and UK, as euro
+countries. The model may excuse itself by saying that [Denmark krone is pegged to the euro](https://en.wikipedia.org/wiki/Denmark_and_the_euro).
 
 ```{r logistic_regression_prediction}
 contrasts(gdp_gr$euro)
