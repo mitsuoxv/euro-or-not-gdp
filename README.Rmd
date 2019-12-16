@@ -25,12 +25,13 @@ This is my second attempt to utilize R language for economic analysis after [Yel
 
 ## Libraries
 
-As usual I attach tidyverse package. As I will struggle with dates, I attach lubridate packeage. I also attach rvest package for web scraping to get the euro entry date of each country. Although I don't attach, I use eurostat package to get GDP data, and countrycode package to convert country codes to names.
+As usual I attach tidyverse package. As I will struggle with dates, I attach lubridate packeage. I attach ggrepel package to add neat label functionality to ggplot2. I also attach rvest package for web scraping to get the euro entry date of each country. Although I don't attach, I use eurostat package to get GDP data, and countrycode package to convert country codes to names.
 
 ```{r libraries, message=FALSE}
 library(tidyverse)
 library(lubridate)
 library(rvest)
+library(ggrepel)
 
 ```
 
@@ -286,7 +287,7 @@ gdp_gr %>%
   geom_abline(intercept = 0, slope = 1) +
   geom_abline(intercept = - coefs[1] / coefs[3], slope = - coefs[2] / coefs[3],  linetype = "dashed") +
   geom_point(aes(color = euro)) +
-  geom_text(aes(label = name), hjust = -0.2, vjust = 0.3) +
+  geom_text_repel(aes(label = name), size = 4) +
   labs(
     title = "Real GDP growth rates (percent, annualized)",
     x = str_c("From ", quarter(START, with_year = TRUE), "Q to ", quarter(STD, with_year = TRUE), "Q"),
@@ -372,7 +373,7 @@ gdp_gr %>%
   geom_abline(intercept = 0, slope = 1) +
   geom_abline(intercept = - coefs[1] / coefs[3], slope = - coefs[2] / coefs[3],  linetype = "dashed") +
   geom_point(aes(color = euro)) +
-  geom_text(aes(label = name), hjust = -0.2, vjust = 0.3) +
+  geom_text_repel(aes(label = name), size = 4) +
   labs(
     title = "Real GDP growth rates (percent, annualized)",
     x = str_c("From ", quarter(START, with_year = TRUE), "Q to ", quarter(STD, with_year = TRUE), "Q"),
