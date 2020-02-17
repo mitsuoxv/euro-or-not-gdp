@@ -168,10 +168,14 @@ eu_gdp %>%
   geom_line(aes(color = euro), size = 1) +
   facet_wrap(~ name) +
   coord_cartesian(ylim = YLIM) +
+  theme(
+    axis.title.x = element_blank(),
+    axis.title.y = element_blank()
+    ) +
   labs(
-    title = str_c("Europe; Real GDP, ", quarter(STD, with_year = TRUE), "Q=100"),
-    x = "",
-    y = "")
+    title = str_c("Europe; Real GDP, ", quarter(STD, with_year = TRUE),
+                  "Q=100")
+    )
 
 ggsave(filename = "output/GDP-euro-or-not.pdf",
        width = 10, height = 8, units = "in", dpi = 300)
@@ -300,10 +304,10 @@ ggsave(filename = "output/GDP-euro-or-not3.pdf",
 
 ```
 
-The logstic regression model classifies correctly 18 out of 24 countries. It assigns euro probability to each country. Among euro countries, the highest probabilities go to Greece, Italy and Portugal. They are the most euro-ic countries, according to this model. Ireland has the lowest probability, and is misclassified as non-euro, probably because of [Leprechaun economics](https://en.wikipedia.org/wiki/Leprechaun_economics).
+The logstic regression model classifies correctly 21 out of 25 countries. It assigns euro probability to each country. Among euro countries, the highest probabilities go to Greece, Italy and Portugal. They are the most euro-ic countries, according to this model. Ireland has the lowest probability, and is misclassified as non-euro, probably because of [Leprechaun economics](https://en.wikipedia.org/wiki/Leprechaun_economics).
 
-The model misclassifies 3 non-euro countries, Denmark, Norway and UK, as euro
-countries. The model may excuse itself by saying that [Denmark krone is pegged to the euro](https://en.wikipedia.org/wiki/Denmark_and_the_euro).
+The model misclassifies 1 non-euro country, Denmark, as a euro
+country. The model may excuse itself by saying that [Denmark krone is pegged to the euro](https://en.wikipedia.org/wiki/Denmark_and_the_euro).
 
 ```{r logistic_regression_prediction}
 contrasts(gdp_gr$euro)
