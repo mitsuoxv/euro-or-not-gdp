@@ -115,11 +115,16 @@ euro_entry <- wiki %>%
 
 euro_entry_tbl <- 
   tibble(
-    name = euro_entry[seq(1, 132, 6)],
-    date_fixed = euro_entry[seq(1, 132, 6) + 4]
+    name = euro_entry[seq(1, 95, 5)],
+    date_fixed = euro_entry[seq(1, 95, 5) + 3]
   )
 
-euro_entry_tbl$date_fixed <- as.Date(euro_entry_tbl$date_fixed)
+euro_entry_tbl$date_fixed <- as_date(euro_entry_tbl$date_fixed, format = "%d %B %Y")
+
+euro_entry_tbl$name <- c("Austria", "Belgium", "Netherlands", "Finland", "France",
+                         "Germany", "Ireland", "Italy", "Luxembourg", "Portugal",
+                         "Spain", "Greece", "Slovenia", "Cyprus", "Malta",
+                         "Slovakia", "Estonia", "Latvia", "Lituania")
 
 ```
 
@@ -184,6 +189,13 @@ ggsave(filename = "output/GDP-euro-or-not.pdf",
 
 ## Euro or not
 
+As coronavirus disrupted the economic recovery in 2020, from now on I will analyze the recovery up to the first quarter of 2020.
+
+```{r set_end}
+END <- "2020-01-01"
+```
+
+
 ### Simple comparison of recovery from the Great Recession
 
 Can I say something by looking at the plot? Did the countries in euro fail to recover as much as the countries outside of euro did?
@@ -200,7 +212,8 @@ eu_gdp2 <- eu_gdp %>%
 latest_gdp <- eu_gdp2 %>% 
   drop_na(values) %>% 
   group_by(name) %>% 
-  filter(time == max(time)) %>% 
+  filter(time == END) %>% 
+#  filter(time == max(time)) %>% 
   ungroup()
 
 latest_gdp %>% 

@@ -17,7 +17,7 @@ Mitsuo Shiota
       - [Before and after growth rates, and classifier: logistic
         regression](#before-and-after-growth-rates-and-classifier-logistic-regression)
 
-Updated: 2020-02-17
+Updated: 2021-01-08
 
 ## Summary
 
@@ -140,11 +140,16 @@ euro_entry <- wiki %>%
 
 euro_entry_tbl <- 
   tibble(
-    name = euro_entry[seq(1, 132, 6)],
-    date_fixed = euro_entry[seq(1, 132, 6) + 4]
+    name = euro_entry[seq(1, 95, 5)],
+    date_fixed = euro_entry[seq(1, 95, 5) + 3]
   )
 
-euro_entry_tbl$date_fixed <- as.Date(euro_entry_tbl$date_fixed)
+euro_entry_tbl$date_fixed <- as_date(euro_entry_tbl$date_fixed, format = "%d %B %Y")
+
+euro_entry_tbl$name <- c("Austria", "Belgium", "Netherlands", "Finland", "France",
+                         "Germany", "Ireland", "Italy", "Luxembourg", "Portugal",
+                         "Spain", "Greece", "Slovenia", "Cyprus", "Malta",
+                         "Slovakia", "Estonia", "Latvia", "Lituania")
 ```
 
 I add “date\_fixed” column to GDP data, compare it with “time” column,
@@ -205,8 +210,6 @@ eu_gdp %>%
     )
 ```
 
-    ## Warning: Removed 2 rows containing missing values (geom_path).
-
 ![](README_files/figure-gfm/plot-1.png)<!-- -->
 
 ``` r
@@ -214,9 +217,14 @@ ggsave(filename = "output/GDP-euro-or-not.pdf",
        width = 10, height = 8, units = "in", dpi = 300)
 ```
 
-    ## Warning: Removed 2 rows containing missing values (geom_path).
-
 ## Euro or not
+
+As coronavirus disrupted the economic recovery in 2020, from now on I
+will analyze the recovery up to the first quarter of 2020.
+
+``` r
+END <- "2020-01-01"
+```
 
 ### Simple comparison of recovery from the Great Recession
 
@@ -236,7 +244,8 @@ eu_gdp2 <- eu_gdp %>%
 latest_gdp <- eu_gdp2 %>% 
   drop_na(values) %>% 
   group_by(name) %>% 
-  filter(time == max(time)) %>% 
+  filter(time == END) %>% 
+#  filter(time == max(time)) %>% 
   ungroup()
 
 latest_gdp %>% 
@@ -266,19 +275,19 @@ latest_gdp %>%
 ```
 
     ## # A tibble: 30 x 4
-    ##    time       name       euro  index
-    ##    <date>     <fct>      <fct> <dbl>
-    ##  1 2019-07-01 Malta      N      174.
-    ##  2 2019-07-01 Ireland    Y      163.
-    ##  3 2019-07-01 Poland     N      157.
-    ##  4 2019-07-01 Romania    N      145.
-    ##  5 2019-07-01 Bulgaria   N      133.
-    ##  6 2019-07-01 Luxembourg Y      131.
-    ##  7 2019-10-01 Lithuania  N      130.
-    ##  8 2019-07-01 Serbia     N      128.
-    ##  9 2019-07-01 Czechia    N      125.
-    ## 10 2019-07-01 Hungary    N      125.
-    ## # ... with 20 more rows
+    ##    time       name        euro  index
+    ##    <date>     <fct>       <fct> <dbl>
+    ##  1 2020-01-01 Malta       N      174.
+    ##  2 2020-01-01 Ireland     Y      162.
+    ##  3 2020-01-01 Poland      N      157.
+    ##  4 2020-01-01 Romania     N      146.
+    ##  5 2020-01-01 Bulgaria    N      134.
+    ##  6 2020-01-01 Lithuania   N      130.
+    ##  7 2020-01-01 Luxembourg  Y      130.
+    ##  8 2020-01-01 Serbia      N      130.
+    ##  9 2020-01-01 Hungary     N      125.
+    ## 10 2020-01-01 Switzerland N      124.
+    ## # … with 20 more rows
 
 ``` r
 latest_gdp %>% 
@@ -287,19 +296,19 @@ latest_gdp %>%
 ```
 
     ## # A tibble: 30 x 4
-    ##    time       name     euro  index
-    ##    <date>     <fct>    <fct> <dbl>
-    ##  1 2019-07-01 Greece   Y      79.5
-    ##  2 2019-10-01 Italy    Y      95.8
-    ##  3 2019-07-01 Croatia  N     105. 
-    ##  4 2019-07-01 Portugal Y     105. 
-    ##  5 2019-07-01 Finland  Y     107. 
-    ##  6 2019-07-01 Latvia   N     109. 
-    ##  7 2019-10-01 Spain    Y     109. 
-    ##  8 2019-10-01 France   Y     112. 
-    ##  9 2019-07-01 Denmark  N     114. 
-    ## 10 2019-10-01 Austria  Y     116. 
-    ## # ... with 20 more rows
+    ##    time       name           euro  index
+    ##    <date>     <fct>          <fct> <dbl>
+    ##  1 2020-01-01 Greece         Y      74.5
+    ##  2 2020-01-01 Italy          Y      90.8
+    ##  3 2020-01-01 Portugal       Y     103. 
+    ##  4 2020-01-01 Spain          Y     104. 
+    ##  5 2020-01-01 Croatia        N     105. 
+    ##  6 2020-01-01 Finland        Y     105. 
+    ##  7 2020-01-01 France         Y     106. 
+    ##  8 2020-01-01 Latvia         N     107. 
+    ##  9 2020-01-01 Austria        Y     112. 
+    ## 10 2020-01-01 United Kingdom N     113. 
+    ## # … with 20 more rows
 
 But this comparison may be unfair. Euro area countries are so advanced
 that they have already reaped low hanging fruits of productivity, and
@@ -336,20 +345,20 @@ gdp_gr <- gdp_2index %>%
 gdp_gr
 ```
 
-    ## # A tibble: 25 x 4
+    ## # A tibble: 27 x 4
     ##    name        euro    gr1    gr2
     ##    <fct>       <fct> <dbl>  <dbl>
-    ##  1 Belgium     Y      2.50  1.20 
-    ##  2 Bulgaria    N      3.39  2.30 
-    ##  3 Switzerland N      2.17  1.59 
-    ##  4 Cyprus      N      4.18  1.21 
-    ##  5 Germany     Y      1.54  1.24 
-    ##  6 Denmark     N      2.19  1.06 
-    ##  7 Estonia     N      6.98  1.31 
-    ##  8 Greece      Y      3.83 -1.81 
-    ##  9 Spain       Y      3.68  0.714
-    ## 10 Finland     Y      3.96  0.573
-    ## # ... with 15 more rows
+    ##  1 Austria     Y      2.56  0.881
+    ##  2 Belgium     Y      2.51  0.944
+    ##  3 Bulgaria    N      3.39  2.28 
+    ##  4 Switzerland N      2.11  1.64 
+    ##  5 Cyprus      N      4.16  1.27 
+    ##  6 Germany     Y      1.54  1.03 
+    ##  7 Denmark     N      2.19  1.01 
+    ##  8 Estonia     N      6.99  1.24 
+    ##  9 Greece      Y      3.83 -2.24 
+    ## 10 Spain       Y      3.68  0.287
+    ## # … with 17 more rows
 
 ``` r
 gdp_2index %>% 
@@ -357,16 +366,14 @@ gdp_2index %>%
   select(name)
 ```
 
-    ## # A tibble: 5 x 1
+    ## # A tibble: 3 x 1
     ##   name       
     ##   <fct>      
-    ## 1 Austria    
-    ## 2 Czechia    
-    ## 3 Croatia    
-    ## 4 Malta      
-    ## 5 Netherlands
+    ## 1 Czechia    
+    ## 2 Malta      
+    ## 3 Netherlands
 
-I lose 5 countries, because their data at 1Q 1995 is not available.
+I lose 3 countries, because their data at 1Q 1995 is not available.
 
 If the growth rates before and after the Great Recession is the same,
 that country positions on the upslope straight line. All countries are
@@ -407,19 +414,19 @@ summary(fit)
     ## 
     ## Deviance Residuals: 
     ##     Min       1Q   Median       3Q      Max  
-    ## -1.2454  -0.9951  -0.6642   1.0742   2.3007  
+    ## -1.3106  -0.9855  -0.6129   1.0166   2.4240  
     ## 
     ## Coefficients:
     ##             Estimate Std. Error z value Pr(>|z|)
-    ## (Intercept)   1.1767     1.1788   0.998    0.318
-    ## gr1          -0.1148     0.2846  -0.404    0.687
-    ## gr2          -0.7267     0.5030  -1.445    0.149
+    ## (Intercept)   1.2931     1.1531   1.121    0.262
+    ## gr1          -0.1707     0.2889  -0.591    0.555
+    ## gr2          -0.7752     0.4795  -1.617    0.106
     ## 
     ## (Dispersion parameter for binomial family taken to be 1)
     ## 
-    ##     Null deviance: 34.296  on 24  degrees of freedom
-    ## Residual deviance: 30.577  on 22  degrees of freedom
-    ## AIC: 36.577
+    ##     Null deviance: 37.096  on 26  degrees of freedom
+    ## Residual deviance: 32.058  on 24  degrees of freedom
+    ## AIC: 38.058
     ## 
     ## Number of Fisher Scoring iterations: 4
 
@@ -455,10 +462,9 @@ has the lowest probability, and is misclassified as non-euro, probably
 because of [Leprechaun
 economics](https://en.wikipedia.org/wiki/Leprechaun_economics).
 
-The model misclassifies 1 non-euro country, Denmark, as a
-euro country. The model may excuse itself by saying that [Denmark
-krone is pegged to the
-euro](https://en.wikipedia.org/wiki/Denmark_and_the_euro).
+The model misclassifies 1 non-euro country, Denmark, as a euro country.
+The model may excuse itself by saying that [Denmark krone is pegged to
+the euro](https://en.wikipedia.org/wiki/Denmark_and_the_euro).
 
 ``` r
 contrasts(gdp_gr$euro)
@@ -489,14 +495,14 @@ table(gdp_gr$euro, gdp_gr$pred, deparse.level = 2)
 
     ##            gdp_gr$pred
     ## gdp_gr$euro  N  Y
-    ##           N 13  1
-    ##           Y  3  8
+    ##           N 12  3
+    ##           Y  3  9
 
 ``` r
 mean(gdp_gr$euro == gdp_gr$pred)
 ```
 
-    ## [1] 0.84
+    ## [1] 0.7777778
 
 ``` r
 gdp_gr %>% 
@@ -504,20 +510,21 @@ gdp_gr %>%
   arrange(desc(pred_prob))
 ```
 
-    ## # A tibble: 11 x 6
+    ## # A tibble: 12 x 6
     ##    name       euro    gr1    gr2 pred_prob pred 
     ##    <fct>      <fct> <dbl>  <dbl>     <dbl> <fct>
-    ##  1 Greece     Y      3.83 -1.81     0.887  Y    
-    ##  2 Italy      Y      1.54 -0.334    0.776  Y    
-    ##  3 Portugal   Y      2.44  0.428    0.642  Y    
-    ##  4 Finland    Y      3.96  0.573    0.576  Y    
-    ##  5 France     Y      2.30  0.915    0.562  Y    
-    ##  6 Spain      Y      3.68  0.714    0.559  Y    
-    ##  7 Germany    Y      1.54  1.24     0.525  Y    
-    ##  8 Belgium    Y      2.50  1.20     0.503  Y    
-    ##  9 Slovenia   Y      4.12  1.24     0.451  N    
-    ## 10 Luxembourg Y      4.82  2.20     0.274  N    
-    ## 11 Ireland    Y      7.33  4.00     0.0709 N
+    ##  1 Greece     Y      3.83 -2.24     0.915  Y    
+    ##  2 Italy      Y      1.54 -0.736    0.832  Y    
+    ##  3 Portugal   Y      2.44  0.202    0.672  Y    
+    ##  4 France     Y      2.30  0.443    0.636  Y    
+    ##  5 Spain      Y      3.68  0.287    0.609  Y    
+    ##  6 Finland    Y      3.96  0.358    0.584  Y    
+    ##  7 Germany    Y      1.54  1.03     0.557  Y    
+    ##  8 Austria    Y      2.56  0.881    0.543  Y    
+    ##  9 Belgium    Y      2.51  0.944    0.533  Y    
+    ## 10 Slovenia   Y      4.12  0.934    0.466  N    
+    ## 11 Luxembourg Y      4.82  2.03     0.250  N    
+    ## 12 Ireland    Y      7.19  3.80     0.0530 N
 
 You can change parameters like START and STD, and may see the growth
 trend shift differently. For example, below I set START as 1Q 2000, STD
@@ -528,7 +535,13 @@ START <- "2000-01-01"
 STD <- "2005-01-01"
 ```
 
+    ## Warning: ggrepel: 1 unlabeled data points (too many overlaps). Consider
+    ## increasing max.overlaps
+
 ![](README_files/figure-gfm/different_parameters_plot-1.png)<!-- -->
+
+    ## Warning: ggrepel: 1 unlabeled data points (too many overlaps). Consider
+    ## increasing max.overlaps
 
     ##            gdp_gr$pred
     ## gdp_gr$euro  N  Y
@@ -540,19 +553,19 @@ STD <- "2005-01-01"
     ## # A tibble: 13 x 6
     ##    name        euro    gr1    gr2 pred_prob pred 
     ##    <fct>       <fct> <dbl>  <dbl>     <dbl> <fct>
-    ##  1 Italy       Y      1.76 -0.289    0.866  Y    
-    ##  2 Portugal    Y      1.65  0.369    0.812  Y    
-    ##  3 Greece      Y      5.73 -1.57     0.799  Y    
-    ##  4 Germany     Y      1.80  1.07     0.720  Y    
-    ##  5 France      Y      2.76  0.791    0.691  Y    
-    ##  6 Netherlands Y      2.85  0.996    0.654  Y    
-    ##  7 Austria     Y      3.16  0.993    0.630  Y    
-    ##  8 Belgium     Y      3.23  1.04     0.618  Y    
-    ##  9 Finland     Y      4.34  0.493    0.616  Y    
-    ## 10 Spain       Y      4.96  0.617    0.545  Y    
-    ## 11 Slovenia    Y      6.18  1.07     0.369  N    
-    ## 12 Luxembourg  Y      5.37  1.89     0.308  N    
-    ## 13 Ireland     Y      8.53  3.44     0.0515 N
+    ##  1 Italy       Y      1.77 -0.638    0.893  Y    
+    ##  2 Greece      Y      5.74 -1.94     0.884  Y    
+    ##  3 Portugal    Y      1.65  0.175    0.814  Y    
+    ##  4 France      Y      2.75  0.384    0.727  Y    
+    ##  5 Germany     Y      1.81  0.893    0.698  Y    
+    ##  6 Finland     Y      4.38  0.310    0.638  Y    
+    ##  7 Netherlands Y      2.85  0.860    0.636  Y    
+    ##  8 Austria     Y      3.19  0.764    0.632  Y    
+    ##  9 Belgium     Y      3.24  0.817    0.618  Y    
+    ## 10 Spain       Y      4.96  0.249    0.609  Y    
+    ## 11 Slovenia    Y      6.18  0.809    0.407  N    
+    ## 12 Luxembourg  Y      5.37  1.75     0.284  N    
+    ## 13 Ireland     Y      8.76  3.29     0.0396 N
 
 This time I don’t lose any country, and Germany is more euro-ic.
 
