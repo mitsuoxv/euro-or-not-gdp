@@ -17,7 +17,7 @@ Mitsuo Shiota
       - [Before and after growth rates, and classifier: logistic
         regression](#before-and-after-growth-rates-and-classifier-logistic-regression)
 
-Updated: 2021-01-08
+Updated: 2021-01-09
 
 ## Summary
 
@@ -140,16 +140,17 @@ euro_entry <- wiki %>%
 
 euro_entry_tbl <- 
   tibble(
-    name = euro_entry[seq(1, 95, 5)],
+    geo = euro_entry[seq(1, 95, 5) + 1],
     date_fixed = euro_entry[seq(1, 95, 5) + 3]
   )
 
 euro_entry_tbl$date_fixed <- as_date(euro_entry_tbl$date_fixed, format = "%d %B %Y")
 
-euro_entry_tbl$name <- c("Austria", "Belgium", "Netherlands", "Finland", "France",
-                         "Germany", "Ireland", "Italy", "Luxembourg", "Portugal",
-                         "Spain", "Greece", "Slovenia", "Cyprus", "Malta",
-                         "Slovakia", "Estonia", "Latvia", "Lituania")
+euro_entry_tbl <- euro_entry_tbl %>% 
+  mutate(
+    geo = str_sub(geo, 1L, 2L),
+    geo = if_else(geo == "GR", "EL", geo) # Greece
+  )
 ```
 
 I add “date\_fixed” column to GDP data, compare it with “time” column,
@@ -158,7 +159,7 @@ or not (“N”).
 
 ``` r
 eu_gdp <- eu_gdp %>% 
-  left_join(euro_entry_tbl, by = "name") %>% 
+  left_join(euro_entry_tbl, by = "geo") %>% 
   mutate(euro = if_else(time >= date_fixed, "Y", "N")) %>% 
   replace_na(list(euro = "N"))
 
