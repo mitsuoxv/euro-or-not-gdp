@@ -11,7 +11,7 @@ Mitsuo Shiota
     when](#which-country-introduced-euro-and-when)
 -   [Plot](#plot)
 
-Updated: 2021-08-07
+Updated: 2021-11-30
 
 I used to predict whether the country adopts euro or not by fitting
 logistic regression using its GDP recovery from the Great Recession up
@@ -115,7 +115,7 @@ wiki <- read_html("https://en.wikipedia.org/wiki/Euro")
 
 euro_entry <- wiki %>% 
   html_nodes("table") %>% 
-  .[[3]] %>% 
+  .[[2]] %>% 
   html_nodes("td") %>% 
   html_text() %>% 
   str_sub(1, -2)
@@ -193,7 +193,7 @@ eu_gdp %>%
     )
 ```
 
-    ## Warning: Removed 2 row(s) containing missing values (geom_path).
+    ## Warning: Removed 1 row(s) containing missing values (geom_path).
 
 ![](README_files/figure-gfm/plot-1.png)<!-- -->
 
@@ -202,6 +202,6 @@ ggsave(filename = "output/GDP-euro-or-not.pdf",
        width = 10, height = 8, units = "in", dpi = 300)
 ```
 
-    ## Warning: Removed 2 row(s) containing missing values (geom_path).
+    ## Warning: Removed 1 row(s) containing missing values (geom_path).
 
 EOL

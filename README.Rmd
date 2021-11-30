@@ -100,7 +100,7 @@ wiki <- read_html("https://en.wikipedia.org/wiki/Euro")
 
 euro_entry <- wiki %>% 
   html_nodes("table") %>% 
-  .[[3]] %>% 
+  .[[2]] %>% 
   html_nodes("td") %>% 
   html_text() %>% 
   str_sub(1, -2)
