@@ -11,7 +11,7 @@ Mitsuo Shiota
     when](#which-country-introduced-euro-and-when)
 -   [Plot](#plot)
 
-Updated: 2021-11-30
+Updated: 2022-02-01
 
 I used to predict whether the country adopts euro or not by fitting
 logistic regression using its GDP recovery from the Great Recession up
@@ -38,15 +38,15 @@ library(rvest)
 provides a wide variety of data. Honestly, it is hard to find the right
 table and parameters. Anyway, I dig Data navigation tree down to
 “Quarterly national accounts”, reach “GDP and main components (output,
-expenditure and income) (namq\_10\_gdp)”, and know the table name is
-“namq\_10\_gdp”. Click Data Explorer icon, and a new window with a large
+expenditure and income) (namq_10_gdp)”, and know the table name is
+“namq_10_gdp”. Click Data Explorer icon, and a new window with a large
 table appears. Look at the upper part, and click + icon to know the
 parameters, like:
 
--   unit: CLV15\_MNAC: Chain linked volumes (2015), million units of
+-   unit: CLV15_MNAC: Chain linked volumes (2015), million units of
     national currency
--   s\_adj: SCA: Seasonally and calendar adjusted data
--   na\_item: B1GQ; Gross domestic product at market prices
+-   s_adj: SCA: Seasonally and calendar adjusted data
+-   na_item: B1GQ; Gross domestic product at market prices
 
 [Cheat sheet: eurostat R
 package](https://cran.r-project.org/web/packages/eurostat/vignettes/cheatsheet.html)
@@ -135,7 +135,7 @@ euro_entry_tbl <- euro_entry_tbl %>%
   )
 ```
 
-I add “date\_fixed” column to GDP data, compare it with “time” column,
+I add “date_fixed” column to GDP data, compare it with “time” column,
 and get “euro” column to show whether each time (row) is in euro (“Y”)
 or not (“N”).
 
@@ -193,7 +193,7 @@ eu_gdp %>%
     )
 ```
 
-    ## Warning: Removed 1 row(s) containing missing values (geom_path).
+    ## Warning: Removed 2 row(s) containing missing values (geom_path).
 
 ![](README_files/figure-gfm/plot-1.png)<!-- -->
 
@@ -202,6 +202,6 @@ ggsave(filename = "output/GDP-euro-or-not.pdf",
        width = 10, height = 8, units = "in", dpi = 300)
 ```
 
-    ## Warning: Removed 1 row(s) containing missing values (geom_path).
+    ## Warning: Removed 2 row(s) containing missing values (geom_path).
 
 EOL
