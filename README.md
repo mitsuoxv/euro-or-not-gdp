@@ -3,15 +3,17 @@ European countries’ GDP, euro or not
 Mitsuo Shiota
 2019-04-11
 
--   [Libraries](#libraries)
--   [Get GDP data](#get-gdp-data)
--   [Add country names by looking up
-    codes](#add-country-names-by-looking-up-codes)
--   [Which country introduced euro, and
-    when](#which-country-introduced-euro-and-when)
--   [Plot](#plot)
+- <a href="#libraries" id="toc-libraries">Libraries</a>
+- <a href="#get-gdp-data" id="toc-get-gdp-data">Get GDP data</a>
+- <a href="#add-country-names-by-looking-up-codes"
+  id="toc-add-country-names-by-looking-up-codes">Add country names by
+  looking up codes</a>
+- <a href="#which-country-introduced-euro-and-when"
+  id="toc-which-country-introduced-euro-and-when">Which country introduced
+  euro, and when</a>
+- <a href="#plot" id="toc-plot">Plot</a>
 
-Updated: 2022-02-01
+Updated: 2023-03-18
 
 I used to predict whether the country adopts euro or not by fitting
 logistic regression using its GDP recovery from the Great Recession up
@@ -30,6 +32,8 @@ country codes to names.
 library(tidyverse)
 library(lubridate)
 library(rvest)
+
+theme_set(theme_light())
 ```
 
 ## Get GDP data
@@ -43,10 +47,10 @@ expenditure and income) (namq_10_gdp)”, and know the table name is
 table appears. Look at the upper part, and click + icon to know the
 parameters, like:
 
--   unit: CLV15_MNAC: Chain linked volumes (2015), million units of
-    national currency
--   s_adj: SCA: Seasonally and calendar adjusted data
--   na_item: B1GQ; Gross domestic product at market prices
+- unit: CLV15_MNAC: Chain linked volumes (2015), million units of
+  national currency
+- s_adj: SCA: Seasonally and calendar adjusted data
+- na_item: B1GQ; Gross domestic product at market prices
 
 [Cheat sheet: eurostat R
 package](https://cran.r-project.org/web/packages/eurostat/vignettes/cheatsheet.html)
@@ -54,16 +58,26 @@ helps me.
 
 ``` r
 eu_gdp <- eurostat::get_eurostat(id = "namq_10_gdp",
+                                 time_format = "raw",
                                  filters = list(
                                    unit = "CLV15_MNAC",
                                    s_adj = "SCA",
                                    na_item = "B1GQ")
                                  )
+```
 
+    ## Reading cache file /tmp/Rtmpi3B9bt/eurostat/namq_10_gdp_raw_code_FF.rds
+
+    ## Table  namq_10_gdp  read from cache file:  /tmp/Rtmpi3B9bt/eurostat/namq_10_gdp_raw_code_FF.rds
+
+``` r
 eu_gdp <- eu_gdp %>% 
   select(time, geo, values)
 
-eu_gdp$geo <- as.character(eu_gdp$geo)
+# eu_gdp$geo <- as.character(eu_gdp$geo)
+
+eu_gdp <- eu_gdp |> 
+  mutate(time = yq(time))
 ```
 
 ## Add country names by looking up codes
@@ -115,7 +129,7 @@ wiki <- read_html("https://en.wikipedia.org/wiki/Euro")
 
 euro_entry <- wiki %>% 
   html_nodes("table") %>% 
-  .[[2]] %>% 
+  .[[3]] %>% 
   html_nodes("td") %>% 
   html_text() %>% 
   str_sub(1, -2)
@@ -163,7 +177,7 @@ you don’t like it, set YLIM as you like.
 # set the parameters to plot
 START <- "1995-01-01"
 STD <- "2007-01-01"
-YLIM <- c(75, 125)
+YLIM <- c(65, 135)
 ```
 
 Line is colored differently depending on whether it is in euro or not.
@@ -179,13 +193,15 @@ eu_gdp <- eu_gdp %>%
 eu_gdp %>% 
   filter(time >= START) %>% 
   ggplot(aes(x = time, y = index)) + 
-  geom_hline(yintercept = 100, color = "white", size = 2) +
+  geom_hline(yintercept = 100, color = "gray70", size = 0.5) +
   geom_line(aes(color = euro), size = 1) +
-  facet_wrap(~ name) +
+  facet_wrap(vars(name)) +
   coord_cartesian(ylim = YLIM) +
   theme(
     axis.title.x = element_blank(),
-    axis.title.y = element_blank()
+    axis.title.y = element_blank(),
+    strip.background = element_blank(),
+    strip.text = element_text(color = "black")
     ) +
   labs(
     title = str_c("Europe; Real GDP, ", quarter(STD, with_year = TRUE),
@@ -193,7 +209,8 @@ eu_gdp %>%
     )
 ```
 
-    ## Warning: Removed 2 row(s) containing missing values (geom_path).
+    ## Warning: Using `size` aesthetic for lines was deprecated in ggplot2 3.4.0.
+    ## ℹ Please use `linewidth` instead.
 
 ![](README_files/figure-gfm/plot-1.png)<!-- -->
 
@@ -201,7 +218,5 @@ eu_gdp %>%
 ggsave(filename = "output/GDP-euro-or-not.pdf",
        width = 10, height = 8, units = "in", dpi = 300)
 ```
-
-    ## Warning: Removed 2 row(s) containing missing values (geom_path).
 
 EOL

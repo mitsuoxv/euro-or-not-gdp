@@ -25,6 +25,7 @@ library(tidyverse)
 library(lubridate)
 library(rvest)
 
+theme_set(theme_light())
 ```
 
 ## Get GDP data
@@ -39,6 +40,7 @@ library(rvest)
 
 ```{r eurostat, cache=FALSE}
 eu_gdp <- eurostat::get_eurostat(id = "namq_10_gdp",
+                                 time_format = "raw",
                                  filters = list(
                                    unit = "CLV15_MNAC",
                                    s_adj = "SCA",
@@ -48,7 +50,10 @@ eu_gdp <- eurostat::get_eurostat(id = "namq_10_gdp",
 eu_gdp <- eu_gdp %>% 
   select(time, geo, values)
 
-eu_gdp$geo <- as.character(eu_gdp$geo)
+# eu_gdp$geo <- as.character(eu_gdp$geo)
+
+eu_gdp <- eu_gdp |> 
+  mutate(time = yq(time))
 
 ```
 
@@ -100,7 +105,7 @@ wiki <- read_html("https://en.wikipedia.org/wiki/Euro")
 
 euro_entry <- wiki %>% 
   html_nodes("table") %>% 
-  .[[2]] %>% 
+  .[[3]] %>% 
   html_nodes("td") %>% 
   html_text() %>% 
   str_sub(1, -2)
@@ -145,7 +150,7 @@ I set the common y-axis range so that I can see the movements of most countries 
 # set the parameters to plot
 START <- "1995-01-01"
 STD <- "2007-01-01"
-YLIM <- c(75, 125)
+YLIM <- c(65, 135)
 
 ```
 
@@ -162,13 +167,15 @@ eu_gdp <- eu_gdp %>%
 eu_gdp %>% 
   filter(time >= START) %>% 
   ggplot(aes(x = time, y = index)) + 
-  geom_hline(yintercept = 100, color = "white", size = 2) +
+  geom_hline(yintercept = 100, color = "gray70", linewidth = 0.5) +
   geom_line(aes(color = euro), size = 1) +
-  facet_wrap(~ name) +
+  facet_wrap(vars(name)) +
   coord_cartesian(ylim = YLIM) +
   theme(
     axis.title.x = element_blank(),
-    axis.title.y = element_blank()
+    axis.title.y = element_blank(),
+    strip.background = element_blank(),
+    strip.text = element_text(color = "black")
     ) +
   labs(
     title = str_c("Europe; Real GDP, ", quarter(STD, with_year = TRUE),
