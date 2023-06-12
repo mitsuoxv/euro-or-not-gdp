@@ -3,17 +3,15 @@ European countries’ GDP, euro or not
 Mitsuo Shiota
 2019-04-11
 
-- <a href="#libraries" id="toc-libraries">Libraries</a>
-- <a href="#get-gdp-data" id="toc-get-gdp-data">Get GDP data</a>
-- <a href="#add-country-names-by-looking-up-codes"
-  id="toc-add-country-names-by-looking-up-codes">Add country names by
-  looking up codes</a>
-- <a href="#which-country-introduced-euro-and-when"
-  id="toc-which-country-introduced-euro-and-when">Which country introduced
-  euro, and when</a>
-- <a href="#plot" id="toc-plot">Plot</a>
+- [Libraries](#libraries)
+- [Get GDP data](#get-gdp-data)
+- [Add country names by looking up
+  codes](#add-country-names-by-looking-up-codes)
+- [Which country introduced euro, and
+  when](#which-country-introduced-euro-and-when)
+- [Plot](#plot)
 
-Updated: 2023-03-18
+Updated: 2023-06-12
 
 I used to predict whether the country adopts euro or not by fitting
 logistic regression using its GDP recovery from the Great Recession up
@@ -66,9 +64,7 @@ eu_gdp <- eurostat::get_eurostat(id = "namq_10_gdp",
                                  )
 ```
 
-    ## Reading cache file /tmp/Rtmpi3B9bt/eurostat/namq_10_gdp_raw_code_FF.rds
-
-    ## Table  namq_10_gdp  read from cache file:  /tmp/Rtmpi3B9bt/eurostat/namq_10_gdp_raw_code_FF.rds
+    ## Table namq_10_gdp cached at /tmp/RtmpbEmwgb/eurostat/namq_10_gdp_raw_code_FF.rds
 
 ``` r
 eu_gdp <- eu_gdp %>% 
@@ -193,7 +189,7 @@ eu_gdp <- eu_gdp %>%
 eu_gdp %>% 
   filter(time >= START) %>% 
   ggplot(aes(x = time, y = index)) + 
-  geom_hline(yintercept = 100, color = "gray70", size = 0.5) +
+  geom_hline(yintercept = 100, color = "gray70", linewidth = 0.5) +
   geom_line(aes(color = euro), size = 1) +
   facet_wrap(vars(name)) +
   coord_cartesian(ylim = YLIM) +
@@ -211,6 +207,9 @@ eu_gdp %>%
 
     ## Warning: Using `size` aesthetic for lines was deprecated in ggplot2 3.4.0.
     ## ℹ Please use `linewidth` instead.
+    ## This warning is displayed once every 8 hours.
+    ## Call `lifecycle::last_lifecycle_warnings()` to see where this warning was
+    ## generated.
 
 ![](README_files/figure-gfm/plot-1.png)<!-- -->
 
