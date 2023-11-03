@@ -11,7 +11,7 @@ Mitsuo Shiota
   when](#which-country-introduced-euro-and-when)
 - [Plot](#plot)
 
-Updated: 2023-06-12
+Updated: 2023-11-04
 
 I used to predict whether the country adopts euro or not by fitting
 logistic regression using its GDP recovery from the Great Recession up
@@ -64,7 +64,7 @@ eu_gdp <- eurostat::get_eurostat(id = "namq_10_gdp",
                                  )
 ```
 
-    ## Table namq_10_gdp cached at /tmp/RtmpbEmwgb/eurostat/namq_10_gdp_raw_code_FF.rds
+    ## Table namq_10_gdp cached at /tmp/RtmpQsF8Qn/eurostat/namq_10_gdp_raw_code_FF.rds
 
 ``` r
 eu_gdp <- eu_gdp %>% 
@@ -211,11 +211,15 @@ eu_gdp %>%
     ## Call `lifecycle::last_lifecycle_warnings()` to see where this warning was
     ## generated.
 
+    ## Warning: Removed 2 rows containing missing values (`geom_line()`).
+
 ![](README_files/figure-gfm/plot-1.png)<!-- -->
 
 ``` r
 ggsave(filename = "output/GDP-euro-or-not.pdf",
        width = 10, height = 8, units = "in", dpi = 300)
 ```
+
+    ## Warning: Removed 2 rows containing missing values (`geom_line()`).
 
 EOL

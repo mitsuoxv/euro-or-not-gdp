@@ -168,7 +168,7 @@ eu_gdp %>%
   filter(time >= START) %>% 
   ggplot(aes(x = time, y = index)) + 
   geom_hline(yintercept = 100, color = "gray70", linewidth = 0.5) +
-  geom_line(aes(color = euro), size = 1) +
+  geom_line(aes(color = euro), linewidth = 1) +
   facet_wrap(vars(name)) +
   coord_cartesian(ylim = YLIM) +
   theme(
