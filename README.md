@@ -11,7 +11,7 @@ Mitsuo Shiota
   when](#which-country-introduced-euro-and-when)
 - [Plot](#plot)
 
-Updated: 2023-11-04
+Updated: 2023-12-29
 
 I used to predict whether the country adopts euro or not by fitting
 logistic regression using its GDP recovery from the Great Recession up
@@ -64,7 +64,7 @@ eu_gdp <- eurostat::get_eurostat(id = "namq_10_gdp",
                                  )
 ```
 
-    ## Table namq_10_gdp cached at /tmp/RtmpQsF8Qn/eurostat/namq_10_gdp_raw_code_FF.rds
+    ## Table namq_10_gdp cached at /tmp/Rtmpl9eEVa/eurostat/919e482eab606377a1ba05304862da5f.rds
 
 ``` r
 eu_gdp <- eu_gdp %>% 
@@ -190,7 +190,7 @@ eu_gdp %>%
   filter(time >= START) %>% 
   ggplot(aes(x = time, y = index)) + 
   geom_hline(yintercept = 100, color = "gray70", linewidth = 0.5) +
-  geom_line(aes(color = euro), size = 1) +
+  geom_line(aes(color = euro), linewidth = 1) +
   facet_wrap(vars(name)) +
   coord_cartesian(ylim = YLIM) +
   theme(
@@ -205,21 +205,11 @@ eu_gdp %>%
     )
 ```
 
-    ## Warning: Using `size` aesthetic for lines was deprecated in ggplot2 3.4.0.
-    ## ℹ Please use `linewidth` instead.
-    ## This warning is displayed once every 8 hours.
-    ## Call `lifecycle::last_lifecycle_warnings()` to see where this warning was
-    ## generated.
-
-    ## Warning: Removed 2 rows containing missing values (`geom_line()`).
-
 ![](README_files/figure-gfm/plot-1.png)<!-- -->
 
 ``` r
 ggsave(filename = "output/GDP-euro-or-not.pdf",
        width = 10, height = 8, units = "in", dpi = 300)
 ```
-
-    ## Warning: Removed 2 rows containing missing values (`geom_line()`).
 
 EOL
