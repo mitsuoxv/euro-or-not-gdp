@@ -11,7 +11,7 @@ Mitsuo Shiota
   when](#which-country-introduced-euro-and-when)
 - [Plot](#plot)
 
-Updated: 2024-01-30
+Updated: 2024-12-18
 
 I used to predict whether the country adopts euro or not by fitting
 logistic regression using its GDP recovery from the Great Recession up
@@ -28,7 +28,6 @@ country codes to names.
 
 ``` r
 library(tidyverse)
-library(lubridate)
 library(rvest)
 
 theme_set(theme_light())
@@ -64,7 +63,11 @@ eu_gdp <- eurostat::get_eurostat(id = "namq_10_gdp",
                                  )
 ```
 
-    ## Table namq_10_gdp cached at /tmp/RtmpNVcq13/eurostat/8261c1bbed7cca749514c64648a5a3f0.rds
+    ## Dataset query already saved in cache_list.json...
+
+    ## Reading cache file /tmp/RtmpsFPuYa/eurostat/0e6b5f4b12c2c954023c717c539aa99a.rds
+
+    ## Table  namq_10_gdp  read from cache file:  /tmp/RtmpsFPuYa/eurostat/0e6b5f4b12c2c954023c717c539aa99a.rds
 
 ``` r
 eu_gdp <- eu_gdp %>% 
@@ -128,7 +131,8 @@ euro_entry <- wiki %>%
   .[[3]] %>% 
   html_nodes("td") %>% 
   html_text() %>% 
-  str_sub(1, -2)
+  str_sub(1, -1) %>% 
+  str_remove("\n")
 
 euro_entry_tbl <- 
   tibble(
@@ -205,15 +209,11 @@ eu_gdp %>%
     )
 ```
 
-    ## Warning: Removed 2 rows containing missing values (`geom_line()`).
-
 ![](README_files/figure-gfm/plot-1.png)<!-- -->
 
 ``` r
 ggsave(filename = "output/GDP-euro-or-not.pdf",
        width = 10, height = 8, units = "in", dpi = 300)
 ```
-
-    ## Warning: Removed 2 rows containing missing values (`geom_line()`).
 
 EOL

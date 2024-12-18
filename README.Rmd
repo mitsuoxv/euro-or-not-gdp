@@ -22,7 +22,6 @@ As usual I attach tidyverse package. As I will struggle with dates, I attach lub
 
 ```{r libraries, message=FALSE}
 library(tidyverse)
-library(lubridate)
 library(rvest)
 
 theme_set(theme_light())
@@ -108,7 +107,8 @@ euro_entry <- wiki %>%
   .[[3]] %>% 
   html_nodes("td") %>% 
   html_text() %>% 
-  str_sub(1, -2)
+  str_sub(1, -1) %>% 
+  str_remove("\n")
 
 euro_entry_tbl <- 
   tibble(
